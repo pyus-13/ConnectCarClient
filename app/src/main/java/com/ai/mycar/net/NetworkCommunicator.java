@@ -21,12 +21,31 @@ import retrofit2.converter.gson.GsonConverterFactory;
  */
 public class NetworkCommunicator {
 
+    private static NetworkCommunicator instance;
+
     private RegisterationAPI mRegisterationAPI;
 
     private RegistrationManager mRegistrationManager;
 
 
-    public NetworkCommunicator() {
+    public static NetworkCommunicator getInstance() {
+
+        if (instance == null) {
+
+            synchronized (NetworkCommunicator.class) {
+                if (null == instance) {
+                    instance = new NetworkCommunicator();
+                }
+            }
+
+        }
+
+        return instance;
+
+    }
+
+
+    private NetworkCommunicator() {
 
         HttpLoggingInterceptor interceptor = new HttpLoggingInterceptor();
         interceptor.setLevel(HttpLoggingInterceptor.Level.BODY);

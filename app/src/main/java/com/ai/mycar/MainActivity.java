@@ -1,14 +1,19 @@
 package com.ai.mycar;
 
+import android.content.Intent;
 import android.os.Bundle;
 import android.support.v7.app.AppCompatActivity;
+import android.view.View;
 import android.widget.EditText;
+import android.widget.ImageButton;
 import android.widget.Toast;
 
 import com.ai.mycar.model.APIResponse;
 import com.ai.mycar.model.User;
 import com.ai.mycar.net.NetworkCommunicator;
+import com.ai.mycar.net.RegisterUtil;
 import com.ai.mycar.rx.RegistrationManager;
+import com.google.firebase.iid.FirebaseInstanceId;
 
 import butterknife.BindView;
 import butterknife.ButterKnife;
@@ -28,7 +33,7 @@ public class MainActivity extends AppCompatActivity {
 
     private RegistrationManager mRegistrationManager;
 
-    private Subscription userSubscription;
+    private Subscription userSubscription , deviceRegisterSubs;
 
     private Unbinder mUnbinder;
     
@@ -42,12 +47,23 @@ public class MainActivity extends AppCompatActivity {
          mUnbinder = ButterKnife.bind(this);
 
 
-        mNetworkCommunicator = new NetworkCommunicator();
+        mNetworkCommunicator = NetworkCommunicator.getInstance();
 
         mRegistrationManager = RegistrationManager.getInstance();
 
+        nameEditText = (EditText) findViewById(R.id.name);
 
-        String s = nameEditText.getText().toString();
+        ImageButton nextButton = (ImageButton) findViewById(R.id.next);
+
+        nextButton.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View view) {
+
+                registerUser();
+
+            }
+        });
+
 
 
     }
@@ -76,10 +92,49 @@ public class MainActivity extends AppCompatActivity {
             @Override
             public void onNext(APIResponse apiResponse) {
 
-                Toast.makeText(MainActivity.this, ""+apiResponse.getMessage(), Toast.LENGTH_SHORT).show();
+                if (apiResponse != null) {
+
+                    String token = FirebaseInstanceId.getInstance().getToken();
+
+                    Toast.makeText(MainActivity.this, "" + token, Toast.LENGTH_SHORT).show();
+
+                    RegisterUtil.sendRegistrationToServer(MainActivity.this, token);
+
+
+                }
+
             }
         });
         
+    }
+
+
+    private void subscribeDevice() {
+
+        deviceRegisterSubs = mRegistrationManager.getRegisterDeviceObservable().subscribe(new Observer<APIResponse>() {
+
+            @Override
+            public void onCompleted() {
+
+            }
+
+            @Override
+            public void onError(Throwable e) {
+
+            }
+
+            @Override
+            public void onNext(APIResponse apiResponse) {
+
+                if (apiResponse != null) {
+
+                    startActivity(new Intent(MainActivity.this, MyCarActivity.class));
+
+                }
+
+            }
+        });
+
     }
 
     @Override
@@ -87,6 +142,8 @@ public class MainActivity extends AppCompatActivity {
         super.onResume();
 
         subscribe();
+
+        subscribeDevice();
     }
 
     @Override
@@ -94,5 +151,22 @@ public class MainActivity extends AppCompatActivity {
         super.onDestroy();
 
         mUnbinder.unbind();
+
+        unsubscribe();
     }
+
+    private void unsubscribe() {
+
+        if (userSubscription != null) {
+
+            userSubscription.unsubscribe();
+        }
+
+        if (deviceRegisterSubs != null) {
+
+            deviceRegisterSubs.unsubscribe();
+        }
+    }
+
+
 }

@@ -1,0 +1,42 @@
+{
+  "project_info": {
+    "project_number": "466014913775",
+    "firebase_url": "https://connected-car-10790.firebaseio.com",
+    "project_id": "connected-car-10790",
+    "storage_bucket": "connected-car-10790.appspot.com"
+  },
+  "client": [
+    {
+      "client_info": {
+        "mobilesdk_app_id": "1:466014913775:android:018fc4a7e4659c40",
+        "android_client_info": {
+          "package_name": "com.ai.mycar"
+        }
+      },
+      "oauth_client": [
+        {
+          "client_id": "466014913775-d0u42369d38g62k2v19b90csu7vrlu6k.apps.googleusercontent.com",
+          "client_type": 3
+        }
+      ],
+      "api_key": [
+        {
+          "current_key": "AIzaSyAv0a0f9gjl8BbT3PNizwX0AbWn7FvvK4M"
+        }
+      ],
+      "services": {
+        "analytics_service": {
+          "status": 1
+        },
+        "appinvite_service": {
+          "status": 1,
+          "other_platform_oauth_client": []
+        },
+        "ads_service": {
+          "status": 2
+        }
+      }
+    }
+  ],
+  "configuration_version": "1"
+}
